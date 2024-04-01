@@ -19,7 +19,7 @@ Les fausses données sont générées à l'aide de la bibliothèque JavaFaker et
 ```bash
 mvn clean compile exec:java -Dexec.mainClass="org.example.DataGenerator"
 ```
-## Commandes CLI pour les opérations CRUD
+## Commandes CLI pour les opérations CRUD (Captures écrans présents dans le dossier document)
 
 Les commandes CLI utilisées pour les opérations CRUD sont les suivantes :
 
