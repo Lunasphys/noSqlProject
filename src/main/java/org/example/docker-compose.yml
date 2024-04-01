@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+  mongo1:
+    image: mongo:latest
+    command: mongod --replSet rs0 --bind_ip localhost,mongo1 --port 27017
+    volumes:
+      - mongo1data:/data/db
+    networks:
+      - mongo-cluster
+    ports:
+      - "27017:27017"
+
+  mongo2:
+    image: mongo:latest
+    command: mongod --replSet rs0 --bind_ip localhost,mongo2 --port 27017
+    volumes:
+      - mongo2data:/data/db
+    networks:
+      - mongo-cluster
+    depends_on:
+      - mongo1
+
+  mongo3:
+    image: mongo:latest
+    command: mongod --replSet rs0 --bind_ip localhost,mongo3 --port 27017
+    volumes:
+      - mongo3data:/data/db
+    networks:
+      - mongo-cluster
+    depends_on:
+      - mongo1
+
+  mongo-init-replica:
+    image: mongo:latest
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    command: >
+      bash -c
+      "sleep 5 &&
+      mongosh --host mongo1:27017 --eval '
+      rs.initiate({
+        _id: \"rs0\",
+        members: [
+          { _id: 0, host: \"example-mongo1-1:27017\" },
+          { _id: 1, host: \"example-mongo2-1:27017\" },
+          { _id: 2, host: \"example-mongo3-1:27017\" }
+        ]
+      });
+      '"
+    networks:
+      - mongo-cluster
+
+networks:
+  mongo-cluster:
+    name: mongo-cluster
+    driver: bridge
+
+volumes:
+  mongo1data:
+  mongo2data:
+  mongo3data:
